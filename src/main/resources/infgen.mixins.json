@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "paulevs.infgen.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+	"OverworldDimensionMixin",
+	"BiomeArrayMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

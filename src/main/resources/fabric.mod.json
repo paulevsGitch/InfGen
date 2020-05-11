@@ -1,0 +1,34 @@
+	{
+	"schemaVersion": 1,
+	"id": "infgen",
+	"version": "${version}",
+
+	"name": "InfGen",
+	"description": "Port of Infdev world generator",
+	"authors": [
+		"paulevs"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+
+	"license": "GPLv3",
+	"icon": "assets/skyworld/icon.png",
+
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"paulevs.infgen.InfGen"
+		]
+	},
+	"mixins": [
+		"infgen.mixins.json"
+	],
+
+	"depends": {
+		"fabricloader": ">=0.7.4",
+		"fabric": "*",
+		"minecraft": "1.15.x"
+	}
+}
