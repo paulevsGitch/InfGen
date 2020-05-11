@@ -1,7 +1,7 @@
-# SkyWorld
-SkyWorld Mod for Fabric, MC 1.15.2
+# InfGen
+InfGen Mod for Fabric, MC 1.15.2
 
-This mod adds new world type with floating islands (developed as better alternative to vanilla buffet preset)
+This mod is a port of Infdev 20100415 world generator mixed with new features.
 
 Building:
 * Clone repo
