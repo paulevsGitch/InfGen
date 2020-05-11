@@ -14,7 +14,7 @@
 	},
 
 	"license": "GPLv3",
-	"icon": "assets/skyworld/icon.png",
+	"icon": "assets/infgen/icon.png",
 
 	"environment": "*",
 	"entrypoints": {
