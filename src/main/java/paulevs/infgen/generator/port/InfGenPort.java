@@ -36,6 +36,7 @@ public class InfGenPort
 	private static final BlockState SAND = Blocks.SAND.getDefaultState();
 	
 	private static final byte[] BLOCKS = new byte[32768];
+	private static final double[][] NOISE = new double[33][4];
 	private int lastX = Integer.MAX_VALUE;
 	private int lastZ = Integer.MAX_VALUE;
 
@@ -105,49 +106,51 @@ public class InfGenPort
 		
 		for (int x = 0; x < 4; x++)
 		{
+			int px = (chunkX << 2) | x;
 			for (int z = 0; z < 4; z++)
 			{
-				double[][] noise = new double[33][4];
-				int px = (chunkX << 2) + x;
-				int pz = (chunkZ << 2) + z;
+				int pz = (chunkZ << 2) | z;
+				int iz = (z << 2) << 7;
 				
-				for (int py = 0; py < noise.length; py++)
+				for (int py = 0; py < NOISE.length; py++)
 				{
-					noise[py][0] = getNoise(px, py, pz);
-					noise[py][1] = getNoise(px, py, pz + 1);
-					noise[py][2] = getNoise(px + 1, py, pz);
-					noise[py][3] = getNoise(px + 1, py, pz + 1);
+					NOISE[py][0] = getNoise(px, py, pz);
+					NOISE[py][1] = getNoise(px, py, pz + 1);
+					NOISE[py][2] = getNoise(px + 1, py, pz);
+					NOISE[py][3] = getNoise(px + 1, py, pz + 1);
 				}
 				
 				for (int py = 0; py < 32; py++)
 				{
-					double n1 = noise[py][0];
-					double n2 = noise[py][1];
-					double n3 = noise[py][2];
-					double n4 = noise[py][3];
-					double n5 = noise[(py + 1)][0];
-					double n7 = noise[(py + 1)][1];
-					double n8 = noise[(py + 1)][2];
-					double n9 = noise[(py + 1)][3];
-					for (int bx = 0; bx < 4; bx++)
+					double n1 = NOISE[py][0];
+					double n2 = NOISE[py][1];
+					double n3 = NOISE[py][2];
+					double n4 = NOISE[py][3];
+					double n5 = NOISE[(py + 1)][0];
+					double n7 = NOISE[(py + 1)][1];
+					double n8 = NOISE[(py + 1)][2];
+					double n9 = NOISE[(py + 1)][3];
+					for (int by = 0; by < 4; by++)
 					{
-						double mixX = bx / 4.0;
-						double nx1 = n1 + (n5 - n1) * mixX;
-						double nx2 = n2 + (n7 - n2) * mixX;
-						double nx3 = n3 + (n8 - n3) * mixX;
-						double nx4 = n4 + (n9 - n4) * mixX;
-						for (int bz = 0; bz < 4; bz++)
+						double mixY = by / 4.0;
+						double nx1 = n1 + (n5 - n1) * mixY;
+						double nx2 = n2 + (n7 - n2) * mixY;
+						double nx3 = n3 + (n8 - n3) * mixY;
+						double nx4 = n4 + (n9 - n4) * mixY;
+						int iy = (py << 2) | by;
+						for (int bx = 0; bx < 4; bx++)
 						{
-							double mixZ = bz / 4.0;
-							double nz1 = nx1 + (nx3 - nx1) * mixZ;
-							double nz2 = nx2 + (nx4 - nx2) * mixZ;
-							int index = bz + (x << 2) << 11 | 0 + (z << 2) << 7 | (py << 2) + bx;
-							for (int by = 0; by < 4; by++)
+							int ix = ((x << 2) | bx) << 11;
+							double mixX = bx / 4.0;
+							double nz1 = nx1 + (nx3 - nx1) * mixX;
+							double nz2 = nx2 + (nx4 - nx2) * mixX;
+							int index = ix | iy | iz;
+							for (int bz = 0; bz < 4; bz++)
 							{
-								double mixY = by / 4.0;
-								double noiseValue = nz1 + (nz2 - nz1) * mixY;
+								double mixZ = bz / 4.0;
+								double noiseValue = nz1 + (nz2 - nz1) * mixZ;
 								byte blockID = ID_AIR;
-								if ((py << 2) + bx < 64)
+								if ((py << 2) + by < 64)
 								{
 									blockID = ID_WATER;
 								}
@@ -172,8 +175,8 @@ public class InfGenPort
 				double n1 = (chunkZ << 4) + z;
 				int sandNoise = this.noiseSand.eval(d1 * 0.03125, n1 * 0.03125, 0.0) + RANDOM.nextDouble() * 0.2 > 0.0 ? 1 : 0;
 				int gravelNoise = this.noiseSand.eval(n1 * 0.03125, 109.0134, d1 * 0.03125) + RANDOM.nextDouble() * 0.2 > 3.0 ? 1 : 0;
-				int height = (int) (this.noiseHeightmap.eval(d1 * 0.03125D * 2.0, n1 * 0.03125D * 2.0) / 3.0 + 3.0 + RANDOM.nextDouble() * 0.25);
-				int index = x << 11 | z << 7 | 0x7F;
+				int height = (int) (this.noiseHeightmap.eval(d1 * 0.0625, n1 * 0.0625) / 3.0 + 3.0 + RANDOM.nextDouble() * 0.25);
+				int index = x << 11 | z << 7 | 0x7F; // 0x7F = 127
 				int checker = -1;
 				int blockID1 = ID_GRASS;
 				int blockID2 = ID_DIRT;
@@ -235,62 +238,37 @@ public class InfGenPort
 	
 	private double getNoise(double x, double y, double z)
 	{
-		double d1;
-		if ((d1 = y * 4.0 - 64.0) < 0.0)
+		double elevGrad;
+		if ((elevGrad = y * 4.0 - 64.0) < 0.0)
 		{
-			d1 *= 3.0;
+			elevGrad *= 3.0;
 		}
 		
-		double d2;
+		double noise;
 		double res;
 		
-		if ((d2 = this.noiseC.eval(x * 684.412 / 80.0, y * 684.412 / 400.0, z * 684.412 / 80.0) / 2.0) < -1)
+		if ((noise = this.noiseC.eval(x * 8.55515, y * 1.71103, z * 8.55515) / 2.0) < -1)
 		{
-			if ((res = (this.noiseA.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0) - d1) < -10.0)
-			{
-				res = -10.0;
-			}
-			if (res > 10.0)
-			{
-				res = 10.0;
-			}
+			res = clamp(this.noiseA.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - elevGrad, -10.0, 10.0);
 		}
-		else if (d2 > 1.0)
+		else if (noise > 1.0)
 		{
-			if ((res = (this.noiseB.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0) - d1) < -10.0)
-			{
-				res = -10.0;
-			}
-			if (res > 10.0)
-			{
-				res = 10.0;
-			}
+			res = clamp(this.noiseB.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - elevGrad, -10.0, 10.0);
 		}
 		else
 		{
-			double d5 = this.noiseA.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - d1;
-			double d6 = this.noiseB.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - d1;
-			if (d5 < -10.0)
-			{
-				d5 = -10.0;
-			}
-			if (d5 > 10.0)
-			{
-				d5 = 10.0;
-			}
-			if (d6 < -10.0)
-			{
-				d6 = -10.0;
-			}
-			if (d6 > 10.0)
-			{
-				d6 = 10.0;
-			}
-			double d7 = (d2 + 1.0) / 2.0;
-			res = d5 + (d6 - d5) * d7;
+			double noise2 = clamp(this.noiseA.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - elevGrad, -10.0, 10.0);
+			double noise3 = clamp(this.noiseB.eval(x * 684.412, y * 984.412, z * 684.412) / 512.0 - elevGrad, -10.0, 10.0);
+			double mix = (noise + 1.0) / 2.0;
+			res = noise2 + (noise3 - noise2) * mix;
 		}
 		
 		return res;
+	}
+	
+	private double clamp(double x, double min, double max)
+	{
+		return x < min ? min : x > max ? max : x;
 	}
 	
 	public int getHeight(int px, int pz)
