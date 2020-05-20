@@ -10,10 +10,13 @@ import net.minecraft.world.gen.chunk.OverworldChunkGeneratorConfig;
 
 public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 {
+	private boolean onlyInfdev;
+	private int biomeSize;
+	
 	@Override
 	public int getBiomeSize()
 	{
-		return 3;
+		return biomeSize;
 	}
 
 	@Override
@@ -26,12 +29,25 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 	@Environment(EnvType.CLIENT)
 	public Dynamic<?> toDynamic(NbtOps dynamicOps)
 	{
-		return new Dynamic(dynamicOps, dynamicOps.createMap(ImmutableMap.of()));
+		return new Dynamic(dynamicOps, dynamicOps.createMap(ImmutableMap.of(
+				dynamicOps.createString("only_infdev_biome"), dynamicOps.createBoolean(false),
+				dynamicOps.createString("biome_size"), dynamicOps.createInt(3)
+				)));
 	}
 
 	@SuppressWarnings("rawtypes")
 	public static InfWorldChunkGeneratorConfig fromDynamic(Dynamic dynamic)
 	{
-		return new InfWorldChunkGeneratorConfig();
+		InfWorldChunkGeneratorConfig config = new InfWorldChunkGeneratorConfig();
+		
+		config.onlyInfdev = dynamic.get("only_infdev_biome").asBoolean(false);
+		config.biomeSize = dynamic.get("biome_size").asInt(3);
+		
+		return config;
+	}
+	
+	public boolean onlyInfdev()
+	{
+		return onlyInfdev;
 	}
 }

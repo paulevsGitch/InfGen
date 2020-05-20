@@ -5,6 +5,8 @@ import java.util.Random;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos.Mutable;
+import net.minecraft.world.Heightmap.Type;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
 import net.minecraft.world.chunk.Chunk;
 import paulevs.infgen.IBiomeArray;
@@ -26,6 +28,7 @@ public class InfGenPort
 	private ValueNoiseOctaved noiseC;
 	private ValueNoiseOctaved noiseSand;
 	private ValueNoiseOctaved noiseHeightmap;
+	private ValueNoiseOctaved noiseTrees;
 	
 	private static final Mutable POS = new Mutable();
 	private static final BlockState STONE = Blocks.STONE.getDefaultState();
@@ -39,6 +42,12 @@ public class InfGenPort
 	private static final double[][] NOISE = new double[33][4];
 	private int lastX = Integer.MAX_VALUE;
 	private int lastZ = Integer.MAX_VALUE;
+	
+	private static final Ore ORE_COAL = new Ore(Blocks.COAL_ORE.getDefaultState());
+	private static final Ore ORE_IRON = new Ore(Blocks.IRON_ORE.getDefaultState());
+	private static final Ore ORE_GOLD = new Ore(Blocks.GOLD_ORE.getDefaultState());
+	private static final Ore ORE_DIAMOND = new Ore(Blocks.DIAMOND_ORE.getDefaultState());
+	private static final Tree TREE = new Tree();
 
 	public InfGenPort(long paramLong)
 	{
@@ -48,6 +57,11 @@ public class InfGenPort
 		this.noiseC = new ValueNoiseOctaved(RANDOM, 8);
 		this.noiseSand = new ValueNoiseOctaved(RANDOM, 4);
 		this.noiseHeightmap = new ValueNoiseOctaved(RANDOM, 4);
+		
+		// Not in use, switches random on some points (from original code)
+		new ValueNoiseOctaved(RANDOM, 5);
+		
+		this.noiseTrees = new ValueNoiseOctaved(RANDOM, 5);
 	}
 
 	public void makeChunk(int chunkX, int chunkZ, Chunk chunk, BiomeLayerSampler oceanBiomes)
@@ -82,18 +96,21 @@ public class InfGenPort
 			}
 		}
 		
-		IBiomeArray array = (IBiomeArray) chunk.getBiomeArray();
-		for (int x = 0; x < 4; x++)
+		if (oceanBiomes != null)
 		{
-			int px = (x << 2) | 2;
-			int wx = x | (chunkX << 2);
-			for (int z = 0; z < 4; z++)
+			IBiomeArray array = (IBiomeArray) chunk.getBiomeArray();
+			for (int x = 0; x < 4; x++)
 			{
-				int pz = (z << 2) | 2;
-				int wz = z | (chunkZ << 2);
-				int h = getSolidHeight(px, pz);
-				if (h < 63)
-					array.setBiome(x, z, oceanBiomes.sample(wx, wz));
+				int px = (x << 2) | 2;
+				int wx = x | (chunkX << 2);
+				for (int z = 0; z < 4; z++)
+				{
+					int pz = (z << 2) | 2;
+					int wz = z | (chunkZ << 2);
+					int h = getSolidHeight(px, pz);
+					if (h < 63)
+						array.setBiome(x, z, oceanBiomes.sample(wx, wz));
+				}
 			}
 		}
 	}
@@ -313,5 +330,66 @@ public class InfGenPort
 			index--;
 		}
 		return 0;
+	}
+	
+	public void populate(IWorld world, Chunk chunk)
+	{
+		int posX = chunk.getPos().x;
+		int posZ = chunk.getPos().z;
+		
+		RANDOM.setSeed((long) posX * 318279123L + (long) posZ * 919871212L);
+		
+		posX <<= 4;
+		posZ <<= 4;
+
+		for(int i = 0; i < 20; ++i)
+		{
+			int x = posX + RANDOM.nextInt(16);
+			int y = RANDOM.nextInt(128);
+			int z = posZ + RANDOM.nextInt(16);
+			ORE_COAL.generate(world, RANDOM, x, y, z);
+		}
+
+		for(int i = 0; i < 10; ++i)
+		{
+			int var15 = posX + RANDOM.nextInt(16);
+			int var19 = RANDOM.nextInt(64);
+			int var23 = posZ + RANDOM.nextInt(16);
+			ORE_IRON.generate(world, RANDOM, var15, var19, var23);
+		}
+
+		if (RANDOM.nextInt(2) == 0)
+		{
+			int x = posX + RANDOM.nextInt(16);
+			int y = RANDOM.nextInt(32);
+			int z = posZ + RANDOM.nextInt(16);
+			ORE_GOLD.generate(world, RANDOM, x, y, z);
+		}
+
+		if (RANDOM.nextInt(8) == 0)
+		{
+			int x = posX + RANDOM.nextInt(16);
+			int y = RANDOM.nextInt(16);
+			int z = posZ + RANDOM.nextInt(16);
+			ORE_DIAMOND.generate(world, RANDOM, x, y, z);
+		}
+
+		int count = (int) noiseTrees.eval((double) posX * 0.25D, (double) posZ * 0.25D) << 3;
+		TREE.chunkReset();
+		for(int i = 0; i < count; ++ i)
+		{
+			int px = posX + RANDOM.nextInt(16) + 8;
+			int pz = posZ + RANDOM.nextInt(16) + 8;
+			int py = getHeight(px, pz, world);
+			TREE.generate(world, RANDOM, px, py, pz);
+		}
+	}
+	
+	private int getHeight(int x, int z, IWorld world)
+	{
+		Chunk chunk = world.getChunk(x >> 4, z >> 4);
+		x &= 15;
+		z &= 15;
+		return chunk.getHeightmap(Type.WORLD_SURFACE).get(x, z);
 	}
 }

@@ -23,7 +23,7 @@ public class InfChunkGenerator extends ChunkGenerator<InfWorldChunkGeneratorConf
 	{
 		super(world, biomeSource, config);
 		generator = new InfGenPort(world.getSeed());
-		oceanBiomes = InfOceanLayer.build(world.getSeed(), InfdevWorldType.INFDEV, config);
+		oceanBiomes = config.onlyInfdev() ? null : InfOceanLayer.build(world.getSeed(), InfdevWorldType.INFDEV, config);
 	}
 	
 	public static void register() {}
@@ -65,5 +65,10 @@ public class InfChunkGenerator extends ChunkGenerator<InfWorldChunkGeneratorConf
 	public int getHeightOnGround(int x, int z, Heightmap.Type heightmapType)
 	{
 		return generator.getHeight(x, z);
+	}
+	
+	public void populate(IWorld world, int x, int z)
+	{
+		generator.populate(world, world.getChunk(x, z));
 	}
 }

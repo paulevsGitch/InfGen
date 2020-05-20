@@ -1,3 +1,6 @@
 {
-	"generator.inf_gen": "Infdev"
+	"generator.inf_gen": "Infdev",
+	"options.infgen.only_infdev_biome": "Only Infdev Biome",
+	"options.infgen.biome_size": "Biome Size (iterations)",
+	"biome.infgen.infdev": "Infdev"
 }

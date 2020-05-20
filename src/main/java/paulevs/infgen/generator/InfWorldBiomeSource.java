@@ -11,22 +11,25 @@ import net.minecraft.world.biome.Biome.Category;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.biome.source.VanillaLayeredBiomeSourceConfig;
+import paulevs.infgen.InfGen;
 
 public class InfWorldBiomeSource extends BiomeSource
 {
 	private final BiomeLayerSampler biomeSampler;
 	private static final Set<Biome> BIOMES;
+	private final boolean onlyInfdev;
 	
-	public InfWorldBiomeSource(VanillaLayeredBiomeSourceConfig config)
+	public InfWorldBiomeSource(VanillaLayeredBiomeSourceConfig config, boolean onlyInfdev)
 	{
 		super(BIOMES);
-		this.biomeSampler = InfBiomeLayer.build(config.getSeed(), config.getGeneratorType(), config.getGeneratorSettings());
+		this.biomeSampler = onlyInfdev ? null : InfBiomeLayer.build(config.getSeed(), config.getGeneratorType(), config.getGeneratorSettings());
+		this.onlyInfdev = onlyInfdev;
 	}
 
 	@Override
 	public Biome getBiomeForNoiseGen(int biomeX, int biomeY, int biomeZ)
 	{
-		return this.biomeSampler.sample(biomeX, biomeZ);
+		return onlyInfdev ? InfGen.INFDEV : this.biomeSampler.sample(biomeX, biomeZ);
 	}
 	
 	static

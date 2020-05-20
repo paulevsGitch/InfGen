@@ -1,3 +1,6 @@
 {
-	"generator.inf_gen": "Инфдев"
+	"generator.inf_gen": "Infdev",
+	"options.infgen.only_infdev_biome": "Только биом Infdev",
+	"options.infgen.biome_size": "Размер биомов (в итерациях)",
+	"biome.infgen.infdev": "Infdev"
 }
