@@ -5,11 +5,14 @@ import net.minecraft.world.ChunkRegion;
 import net.minecraft.world.Heightmap;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
 import net.minecraft.world.biome.source.BiomeSource;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.chunk.ChunkGenerator;
 import net.minecraft.world.gen.chunk.ChunkGeneratorType;
+import net.minecraft.world.gen.feature.FeatureConfig;
+import net.minecraft.world.gen.feature.StructureFeature;
 import paulevs.infgen.InfdevWorldType;
 import paulevs.infgen.generator.port.InfGenPort;
 
@@ -70,5 +73,11 @@ public class InfChunkGenerator extends ChunkGenerator<InfWorldChunkGeneratorConf
 	public void populate(IWorld world, int x, int z)
 	{
 		generator.populate(world, world.getChunk(x, z));
+	}
+	
+	@Override
+	public boolean hasStructure(Biome biome, StructureFeature<? extends FeatureConfig> structureFeature)
+	{
+		return biome.hasStructureFeature(structureFeature) && config.hasStructure(structureFeature);
 	}
 }

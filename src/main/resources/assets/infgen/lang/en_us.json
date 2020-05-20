@@ -2,5 +2,9 @@
 	"generator.inf_gen": "Infdev",
 	"options.infgen.only_infdev_biome": "Only Infdev Biome",
 	"options.infgen.biome_size": "Biome Size (iterations)",
-	"biome.infgen.infdev": "Infdev"
+	"biome.infgen.infdev": "Infdev",
+	"options.infgen.has_villages": "Generate Villages",
+	"options.infgen.has_dungeons": "Generate Dungeons & Temples",
+	"options.infgen.has_mineshafts": "Generate Mineshafts",
+	"options.infgen.has_other_structures": "Generate Other Structures"
 }

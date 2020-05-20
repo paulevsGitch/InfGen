@@ -17,6 +17,11 @@ public class CustomizeInfdevWorldScreen extends Screen
 	private CompoundTag generatorOptions;
 	private boolean onlyInfdevBiome = false;
 	private int biomeSize = 3;
+	
+	private boolean hasVillages = true;
+	private boolean hasDungeons = true;
+	private boolean hasMineshafts = true;
+	private boolean hasOtherStructures = true;
 
 	private ButtonListWidget list;
 
@@ -31,6 +36,15 @@ public class CustomizeInfdevWorldScreen extends Screen
 			onlyInfdevBiome = generatorOptions.getBoolean("only_infdev_biome");
 		if (generatorOptions.contains("biome_size"))
 			biomeSize = generatorOptions.getInt("biome_size");
+		
+		if (generatorOptions.contains("has_villages"))
+			hasVillages = generatorOptions.getBoolean("has_villages");
+		if (generatorOptions.contains("has_dungeons"))
+			hasDungeons = generatorOptions.getBoolean("has_dungeons");
+		if (generatorOptions.contains("has_mineshafts"))
+			hasMineshafts = generatorOptions.getBoolean("has_mineshafts");
+		if (generatorOptions.contains("has_other_structures"))
+			hasOtherStructures = generatorOptions.getBoolean("has_other_structures");
 	}
 
 	@Override
@@ -44,6 +58,42 @@ public class CustomizeInfdevWorldScreen extends Screen
 			openScreenAndEnableButton();
 		}));
 
+		BooleanOption switchVillages = new BooleanOption(
+				"options.infgen.has_villages",
+				(gameOptions) -> {
+					return hasVillages;
+				}, (gameOptions, value) -> {
+					hasVillages = value;
+					generatorOptions.putBoolean("has_villages", hasVillages);
+				});
+		
+		BooleanOption switchDungeons = new BooleanOption(
+				"options.infgen.has_dungeons",
+				(gameOptions) -> {
+					return hasDungeons;
+				}, (gameOptions, value) -> {
+					hasDungeons = value;
+					generatorOptions.putBoolean("has_dungeons", hasDungeons);
+				});
+		
+		BooleanOption switchMineshafts = new BooleanOption(
+				"options.infgen.has_mineshafts",
+				(gameOptions) -> {
+					return hasMineshafts;
+				}, (gameOptions, value) -> {
+					hasMineshafts = value;
+					generatorOptions.putBoolean("has_mineshafts", hasMineshafts);
+				});
+		
+		BooleanOption switchOther = new BooleanOption(
+				"options.infgen.has_other_structures",
+				(gameOptions) -> {
+					return hasOtherStructures;
+				}, (gameOptions, value) -> {
+					hasOtherStructures = value;
+					generatorOptions.putBoolean("has_other_structures", hasOtherStructures);
+				});
+		
 		this.list = new ButtonListWidget(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
 
 		this.list.addSingleOptionEntry(new BooleanOption(
@@ -65,7 +115,12 @@ public class CustomizeInfdevWorldScreen extends Screen
 					I18n.translate("options.infgen.biome_size"),
 					biomeSize);
 		}));
-
+		
+		this.list.addSingleOptionEntry(switchVillages);
+		this.list.addSingleOptionEntry(switchDungeons);
+		this.list.addSingleOptionEntry(switchMineshafts);
+		this.list.addSingleOptionEntry(switchOther);
+		
 		this.children.add(this.list);
 	}
 
