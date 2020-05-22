@@ -14,7 +14,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.chunk.OverworldChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractTempleFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -138,7 +137,7 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 				result.add(Registry.BIOME.get(id));
 		}
 		if (result.isEmpty())
-			result.add(Biomes.PLAINS);
+			result.addAll(SurfaceBiomes.BIOMES);
 		return result;
 	}
 }
