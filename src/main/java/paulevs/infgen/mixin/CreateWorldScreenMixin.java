@@ -29,6 +29,9 @@ public abstract class CreateWorldScreenMixin extends Screen
 	@Shadow
 	public CompoundTag generatorOptionsTag;
 	
+	@Shadow
+	private boolean moreOptionsOpen;
+	
 	protected CreateWorldScreenMixin(Text title)
 	{
 		super(title);
@@ -44,7 +47,7 @@ public abstract class CreateWorldScreenMixin extends Screen
 				this.minecraft.openScreen(new CustomizeInfdevWorldScreen(self, generatorOptionsTag));
 			}
 		}));
-		InfGen.button_customize.visible = false;
+		InfGen.button_customize.visible = moreOptionsOpen && (LevelGeneratorType.TYPES[this.generatorType] == InfdevWorldType.INFDEV);
 	}
 	
 	@Inject(method = "setMoreOptionsOpen", at = @At("HEAD"))

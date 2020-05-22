@@ -6,5 +6,8 @@
 	"options.infgen.has_villages": "Generate Villages",
 	"options.infgen.has_dungeons": "Generate Dungeons & Temples",
 	"options.infgen.has_mineshafts": "Generate Mineshafts",
-	"options.infgen.has_other_structures": "Generate Other Structures"
+	"options.infgen.has_other_structures": "Generate Other Structures",
+	"options.infgen.biomes": "Biomes List",
+	"options.infgen.generate_bedrock": "Generate Bedrock",
+	"options.infgen.carve_caves": "Generate Caves and Ravines"
 }

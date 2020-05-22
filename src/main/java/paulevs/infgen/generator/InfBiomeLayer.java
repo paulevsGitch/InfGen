@@ -1,7 +1,9 @@
 package paulevs.infgen.generator;
 
+import java.util.Set;
 import java.util.function.LongFunction;
 
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.layer.AddBambooJungleLayer;
 import net.minecraft.world.biome.layer.AddClimateLayers;
 import net.minecraft.world.biome.layer.AddColdClimatesLayer;
@@ -27,12 +29,12 @@ import net.minecraft.world.level.LevelGeneratorType;
 
 public class InfBiomeLayer
 {
-	public static BiomeLayerSampler build(long seed, LevelGeneratorType generatorType, OverworldChunkGeneratorConfig settings)
+	public static BiomeLayerSampler build(long seed, LevelGeneratorType generatorType, OverworldChunkGeneratorConfig settings, Set<Biome> biomes)
 	{
 		LayerFactory<CachingLayerSampler> layerFactory = build(generatorType, settings, (salt) -> {
 			return new CachingLayerContext(25, seed, salt);
 		});
-		return new BiomeLayerSampler(layerFactory);
+		return new BiomeLayerSamplerConfigurable(layerFactory, biomes);
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

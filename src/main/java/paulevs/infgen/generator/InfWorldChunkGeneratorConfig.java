@@ -1,6 +1,9 @@
 package paulevs.infgen.generator;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.mojang.datafixers.Dynamic;
 
@@ -8,6 +11,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.datafixer.NbtOps;
 import net.minecraft.nbt.Tag;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.gen.chunk.OverworldChunkGeneratorConfig;
 import net.minecraft.world.gen.feature.AbstractTempleFeature;
 import net.minecraft.world.gen.feature.FeatureConfig;
@@ -23,6 +30,9 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 	private boolean hasDungeons;
 	private boolean hasMineshafts;
 	private boolean hasOtherStructures;
+	private boolean hasBedrock;
+	private boolean carveCaves;
+	private Set<Biome> biomes;
 	
 	@Override
 	public int getBiomeSize()
@@ -48,6 +58,9 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 		map.put(dynamicOps.createString("has_dungeons"), dynamicOps.createBoolean(true));
 		map.put(dynamicOps.createString("has_mineshafts"), dynamicOps.createBoolean(true));
 		map.put(dynamicOps.createString("has_other_structures"), dynamicOps.createBoolean(true));
+		map.put(dynamicOps.createString("has_bedrock"), dynamicOps.createBoolean(true));
+		map.put(dynamicOps.createString("carve_caves"), dynamicOps.createBoolean(true));
+		map.put(dynamicOps.createString("biomes"), dynamicOps.createByteList(getDefaultBiomes()));
 		
 		return new Dynamic(dynamicOps, dynamicOps.createMap(map));
 	}
@@ -63,6 +76,9 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 		config.hasDungeons = dynamic.get("has_dungeons").asBoolean(true);
 		config.hasMineshafts = dynamic.get("has_mineshafts").asBoolean(true);
 		config.hasOtherStructures = dynamic.get("has_other_structures").asBoolean(true);
+		config.hasBedrock = dynamic.get("has_bedrock").asBoolean(true);
+		config.carveCaves = dynamic.get("carve_caves").asBoolean(true);
+		config.biomes = parceBiomes(dynamic.get("biomes").asByteBuffer());
 		
 		return config;
 	}
@@ -82,5 +98,47 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 			return hasDungeons;
 		else
 			return hasOtherStructures;
+	}
+
+	public boolean carveCaves()
+	{
+		return carveCaves;
+	}
+	
+	public boolean hasBedrock()
+	{
+		return hasBedrock;
+	}
+
+	public Set<Biome> getBiomes()
+	{
+		return biomes;
+	}
+	
+	private ByteBuffer getDefaultBiomes()
+	{
+		String biomes = "";
+		for (Biome biome: SurfaceBiomes.BIOMES)
+		{
+			String name = Registry.BIOME.getId(biome).toString();
+			biomes += biomes.isEmpty() ? name : ";" + name;
+		}
+		return ByteBuffer.wrap(biomes.getBytes());
+	}
+	
+	private static Set<Biome> parceBiomes(ByteBuffer buffer)
+	{
+		Set<Biome> result = new HashSet<Biome>();
+		String biomesAll = new String(buffer.array());
+		String[] biomes = biomesAll.split(";");
+		for (String biome: biomes)
+		{
+			Identifier id = new Identifier(biome);
+			if (Registry.BIOME.containsId(id))
+				result.add(Registry.BIOME.get(id));
+		}
+		if (result.isEmpty())
+			result.add(Biomes.PLAINS);
+		return result;
 	}
 }

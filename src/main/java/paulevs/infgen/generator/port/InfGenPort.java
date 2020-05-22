@@ -7,6 +7,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos.Mutable;
 import net.minecraft.world.Heightmap.Type;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.source.BiomeLayerSampler;
 import net.minecraft.world.chunk.Chunk;
 import paulevs.infgen.IBiomeArray;
@@ -30,10 +31,9 @@ public class InfGenPort
 	private ValueNoiseOctaved noiseHeightmap;
 	private ValueNoiseOctaved noiseTrees;
 	
+	private static final Mutable BIOME_POS = new Mutable();
 	private static final Mutable POS = new Mutable();
 	private static final BlockState STONE = Blocks.STONE.getDefaultState();
-	private static final BlockState GRASS = Blocks.GRASS_BLOCK.getDefaultState();
-	private static final BlockState DIRT = Blocks.DIRT.getDefaultState();
 	private static final BlockState WATER = Blocks.WATER.getDefaultState();
 	private static final BlockState GRAVEL = Blocks.GRAVEL.getDefaultState();
 	private static final BlockState SAND = Blocks.SAND.getDefaultState();
@@ -64,16 +64,19 @@ public class InfGenPort
 		this.noiseTrees = new ValueNoiseOctaved(RANDOM, 5);
 	}
 
-	public void makeChunk(int chunkX, int chunkZ, Chunk chunk, BiomeLayerSampler oceanBiomes)
+	public void makeChunk(int chunkX, int chunkZ, Chunk chunk, BiomeLayerSampler oceanBiomes, IWorld world)
 	{
 		if (!isCached(chunkX, chunkZ))
 			fillArray(chunkX, chunkZ);
 		for (int x = 0; x < 16; x++)
 		{
 			POS.setX(x);
+			BIOME_POS.setX(x + (chunkX << 4));
 			for (int z = 0; z < 16; z++)
 			{
 				POS.setZ(z);
+				BIOME_POS.setZ(z + (chunkZ << 4));
+				Biome biome = world.getBiome(BIOME_POS);
 				int index = x << 11 | z << 7 | 0x7F;
 				for (int y = 127; y >= 0; y--)
 				{
@@ -82,9 +85,13 @@ public class InfGenPort
 					if (id == ID_STONE)
 						chunk.setBlockState(POS, STONE, false);
 					else if (id == ID_DIRT)
-						chunk.setBlockState(POS, DIRT, false);
+					{
+						chunk.setBlockState(POS, biome.getSurfaceConfig().getUnderMaterial(), false);
+					}
 					else if (id == ID_GRASS)
-						chunk.setBlockState(POS, GRASS, false);
+					{
+						chunk.setBlockState(POS, biome.getSurfaceConfig().getTopMaterial(), false);
+					}
 					else if (id == ID_SAND)
 						chunk.setBlockState(POS, SAND, false);
 					else if (id == ID_GRAVEL)

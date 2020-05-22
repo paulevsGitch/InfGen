@@ -6,5 +6,8 @@
 	"options.infgen.has_villages": "Генерировать деревни",
 	"options.infgen.has_dungeons": "Генерировать сокровищницы и храмы",
 	"options.infgen.has_mineshafts": "Генерировать шахты",
-	"options.infgen.has_other_structures": "Генерировать другие структуры"
+	"options.infgen.has_other_structures": "Генерировать другие структуры",
+	"options.infgen.biomes": "Список биомов",
+	"options.infgen.generate_bedrock": "Генерировать бедрок",
+	"options.infgen.carve_caves": "Генерировать пещеры и овраги"
 }

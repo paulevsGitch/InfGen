@@ -22,6 +22,9 @@ public class CustomizeInfdevWorldScreen extends Screen
 	private boolean hasDungeons = true;
 	private boolean hasMineshafts = true;
 	private boolean hasOtherStructures = true;
+	
+	private boolean generateBedrock = true;
+	private boolean carveCaves = true;
 
 	private ButtonListWidget list;
 
@@ -45,6 +48,11 @@ public class CustomizeInfdevWorldScreen extends Screen
 			hasMineshafts = generatorOptions.getBoolean("has_mineshafts");
 		if (generatorOptions.contains("has_other_structures"))
 			hasOtherStructures = generatorOptions.getBoolean("has_other_structures");
+		
+		if (generatorOptions.contains("generate_bedrock"))
+			generateBedrock = generatorOptions.getBoolean("generate_bedrock");
+		if (generatorOptions.contains("carve_caves"))
+			carveCaves = generatorOptions.getBoolean("carve_caves");
 	}
 
 	@Override
@@ -57,42 +65,10 @@ public class CustomizeInfdevWorldScreen extends Screen
 		this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, I18n.translate("gui.cancel"), (buttonWidget) -> {
 			openScreenAndEnableButton();
 		}));
-
-		BooleanOption switchVillages = new BooleanOption(
-				"options.infgen.has_villages",
-				(gameOptions) -> {
-					return hasVillages;
-				}, (gameOptions, value) -> {
-					hasVillages = value;
-					generatorOptions.putBoolean("has_villages", hasVillages);
-				});
 		
-		BooleanOption switchDungeons = new BooleanOption(
-				"options.infgen.has_dungeons",
-				(gameOptions) -> {
-					return hasDungeons;
-				}, (gameOptions, value) -> {
-					hasDungeons = value;
-					generatorOptions.putBoolean("has_dungeons", hasDungeons);
-				});
-		
-		BooleanOption switchMineshafts = new BooleanOption(
-				"options.infgen.has_mineshafts",
-				(gameOptions) -> {
-					return hasMineshafts;
-				}, (gameOptions, value) -> {
-					hasMineshafts = value;
-					generatorOptions.putBoolean("has_mineshafts", hasMineshafts);
-				});
-		
-		BooleanOption switchOther = new BooleanOption(
-				"options.infgen.has_other_structures",
-				(gameOptions) -> {
-					return hasOtherStructures;
-				}, (gameOptions, value) -> {
-					hasOtherStructures = value;
-					generatorOptions.putBoolean("has_other_structures", hasOtherStructures);
-				});
+		this.addButton(new ButtonWidget(this.width / 2 - 155, 8, 150, 20, I18n.translate("options.infgen.biomes"), (buttonWidget) -> {
+			this.minecraft.openScreen(new InfdevBiomesScreen(this, generatorOptions));
+		}));
 		
 		this.list = new ButtonListWidget(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
 
@@ -116,10 +92,59 @@ public class CustomizeInfdevWorldScreen extends Screen
 					biomeSize);
 		}));
 		
-		this.list.addSingleOptionEntry(switchVillages);
-		this.list.addSingleOptionEntry(switchDungeons);
-		this.list.addSingleOptionEntry(switchMineshafts);
-		this.list.addSingleOptionEntry(switchOther);
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.has_villages",
+				(gameOptions) -> {
+					return hasVillages;
+				}, (gameOptions, value) -> {
+					hasVillages = value;
+					generatorOptions.putBoolean("has_villages", hasVillages);
+				}));
+		
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.has_dungeons",
+				(gameOptions) -> {
+					return hasDungeons;
+				}, (gameOptions, value) -> {
+					hasDungeons = value;
+					generatorOptions.putBoolean("has_dungeons", hasDungeons);
+				}));
+		
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.has_mineshafts",
+				(gameOptions) -> {
+					return hasMineshafts;
+				}, (gameOptions, value) -> {
+					hasMineshafts = value;
+					generatorOptions.putBoolean("has_mineshafts", hasMineshafts);
+				}));
+		
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.has_other_structures",
+				(gameOptions) -> {
+					return hasOtherStructures;
+				}, (gameOptions, value) -> {
+					hasOtherStructures = value;
+					generatorOptions.putBoolean("has_other_structures", hasOtherStructures);
+				}));
+		
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.generate_bedrock",
+				(gameOptions) -> {
+					return generateBedrock;
+				}, (gameOptions, value) -> {
+					generateBedrock = value;
+					generatorOptions.putBoolean("generate_bedrock", generateBedrock);
+				}));
+		
+		this.list.addSingleOptionEntry(new BooleanOption(
+				"options.infgen.carve_caves",
+				(gameOptions) -> {
+					return carveCaves;
+				}, (gameOptions, value) -> {
+					carveCaves = value;
+					generatorOptions.putBoolean("carve_caves", carveCaves);
+				}));
 		
 		this.children.add(this.list);
 	}

@@ -42,7 +42,7 @@ public abstract class OverworldDimensionMixin extends Dimension
 			
 			VanillaLayeredBiomeSourceConfig bSource = new VanillaLayeredBiomeSourceConfig(this.world.getLevelProperties());
 			bSource.setGeneratorSettings(config);
-			BiomeSource biomeSource = new InfWorldBiomeSource(bSource, config.onlyInfdev());
+			BiomeSource biomeSource = new InfWorldBiomeSource(bSource, config.onlyInfdev(), config.getBiomes());
 			
 			info.setReturnValue(InfChunkGenerator.INFDEV_CHUNK_GEN.create(this.world, biomeSource, config));
 			info.cancel();
