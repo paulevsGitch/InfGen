@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.options.BooleanOption;
@@ -43,12 +44,46 @@ public class InfdevBiomesScreen extends Screen
 	@Override
 	protected void init()
 	{
+		ArrayList<BooleanOption> options = new ArrayList<BooleanOption>();
+		
 		this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 28, 150, 20, I18n.translate("gui.done"), (buttonWidget) -> {
 			openParrent();
 		}));
 
 		this.addButton(new ButtonWidget(this.width / 2 + 5, this.height - 28, 150, 20, I18n.translate("gui.cancel"), (buttonWidget) -> {
 			openParrent();
+		}));
+		
+		this.addButton(new ButtonWidget(this.width / 2 - 155, 8, 150, 20, I18n.translate("options.infgen.enable_all"), (buttonWidget) -> {
+			for (Biome b: biomes.keySet())
+				biomes.put(b, true);
+			this.list.children().forEach((entry) -> {
+				entry.children().forEach((element) -> {
+					if (element instanceof AbstractButtonWidget)
+					{
+						AbstractButtonWidget button = (AbstractButtonWidget) element;
+						String start = button.getMessage();
+						start = start.substring(0, start.lastIndexOf(":"));
+						button.setMessage(start + ": §a" + I18n.translate("options.on"));
+					}
+				});
+			});
+		}));
+		
+		this.addButton(new ButtonWidget(this.width / 2 + 5, 8, 150, 20, I18n.translate("options.infgen.disable_all"), (buttonWidget) -> {
+			for (Biome b: biomes.keySet())
+				biomes.put(b, false);
+			this.list.children().forEach((entry) -> {
+				entry.children().forEach((element) -> {
+					if (element instanceof AbstractButtonWidget)
+					{
+						AbstractButtonWidget button = (AbstractButtonWidget) element;
+						String start = button.getMessage();
+						start = start.substring(0, start.lastIndexOf(":"));
+						button.setMessage(start + ": §c" + I18n.translate("options.off"));
+					}
+				});
+			});
 		}));
 		
 		this.list = new ButtonListWidget(this.minecraft, this.width, this.height, 32, this.height - 32, 25);
@@ -66,7 +101,7 @@ public class InfdevBiomesScreen extends Screen
 		});
 		
 		biomesList.forEach((biome) -> {
-			this.list.addSingleOptionEntry(new BooleanOption(
+			BooleanOption option = new BooleanOption(
 					"options.infgen." + biome.getTranslationKey(),
 					(gameOptions) -> {
 						return biomes.get(biome);
@@ -77,9 +112,14 @@ public class InfdevBiomesScreen extends Screen
 				@Override
 				public String getDisplayString(GameOptions options)
 				{
-					return I18n.translate(biome.getTranslationKey()) + ": " + I18n.translate(this.get(options) ? "options.on" : "options.off");
+					boolean enable = this.get(options);
+					String sep = enable ? ": §a" : ": §c";
+					return I18n.translate(biome.getTranslationKey()) + sep + I18n.translate(enable ? "options.on" : "options.off");
 				}
-			});
+			};
+		
+			this.list.addSingleOptionEntry(option);
+			options.add(option);
 		});
 		
 		this.children.add(this.list);

@@ -9,5 +9,7 @@
 	"options.infgen.has_other_structures": "Генерировать другие структуры",
 	"options.infgen.biomes": "Список биомов",
 	"options.infgen.generate_bedrock": "Генерировать бедрок",
-	"options.infgen.carve_caves": "Генерировать пещеры и овраги"
+	"options.infgen.carve_caves": "Генерировать пещеры и овраги",
+	"options.infgen.enable_all": "Включить все",
+	"options.infgen.disable_all": "Выключить все"
 }
