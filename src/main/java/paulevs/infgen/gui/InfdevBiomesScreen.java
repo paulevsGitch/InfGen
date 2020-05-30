@@ -64,7 +64,7 @@ public class InfdevBiomesScreen extends Screen
 						AbstractButtonWidget button = (AbstractButtonWidget) element;
 						String start = button.getMessage();
 						start = start.substring(0, start.lastIndexOf(":"));
-						button.setMessage(start + ": §a" + I18n.translate("options.on"));
+						button.setMessage(start + ": \u00A7a" + I18n.translate("options.on"));
 					}
 				});
 			});
@@ -80,7 +80,7 @@ public class InfdevBiomesScreen extends Screen
 						AbstractButtonWidget button = (AbstractButtonWidget) element;
 						String start = button.getMessage();
 						start = start.substring(0, start.lastIndexOf(":"));
-						button.setMessage(start + ": §c" + I18n.translate("options.off"));
+						button.setMessage(start + ": \u00A7c" + I18n.translate("options.off"));
 					}
 				});
 			});
@@ -113,7 +113,7 @@ public class InfdevBiomesScreen extends Screen
 				public String getDisplayString(GameOptions options)
 				{
 					boolean enable = this.get(options);
-					String sep = enable ? ": §a" : ": §c";
+					String sep = enable ? ": \u00A7a" : ": \u00A7c";
 					return I18n.translate(biome.getTranslationKey()) + sep + I18n.translate(enable ? "options.on" : "options.off");
 				}
 			};

@@ -128,13 +128,17 @@ public class InfWorldChunkGeneratorConfig extends OverworldChunkGeneratorConfig
 	private static Set<Biome> parceBiomes(ByteBuffer buffer)
 	{
 		Set<Biome> result = new HashSet<Biome>();
-		String biomesAll = new String(buffer.array());
-		String[] biomes = biomesAll.split(";");
-		for (String biome: biomes)
+		if (buffer != null)
 		{
-			Identifier id = new Identifier(biome);
-			if (Registry.BIOME.containsId(id))
-				result.add(Registry.BIOME.get(id));
+			String biomesAll = new String(buffer.array());
+			String[] biomes = biomesAll.split(";");
+			for (String name: biomes)
+			{
+				Identifier id = new Identifier(name);
+				Biome biome = Registry.BIOME.get(id);
+				if (biome != null)
+					result.add(Registry.BIOME.get(id));
+			}
 		}
 		if (result.isEmpty())
 			result.addAll(SurfaceBiomes.BIOMES);
